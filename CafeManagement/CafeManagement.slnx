@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CafeManagement.Api/CafeManagement.Api.csproj" />
+    <Project Path="src/CafeManagement.Application/CafeManagement.Application.csproj" />
+    <Project Path="src/CafeManagement.Domain/CafeManagement.Domain.csproj" />
+    <Project Path="src/CafeManagement.Infrastructure/CafeManagement.Infrastructure.csproj" />
+  </Folder>
+</Solution>
