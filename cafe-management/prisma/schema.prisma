@@ -4,10 +4,212 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum BusinessRole {
+  OWNER
+  MANAGER
+  CASHIER
+  WAITER
+  KITCHEN
+  DELIVERY
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum PaymentMethod {
+  CASH
+  TELEBIRR
+  CBE_BIRR
+  BANK_TRANSFER
+}
+
+enum PayInterval {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+model User {
+  // The main identity record.
+  // Every account in the system starts here.
+  // Employee and Customer are extensions of this account.
+  id String @id @default(uuid())
+
+  // Authentication identifiers.
+  // Phone is the primary login method for the Ethiopian market.
+  phoneNumber String  @unique
+  email       String? @unique
+
+  // Nullable because customers may use other authentication methods later
+  // such as OTP without a password.
+  passwordHash String?
+
+  // Used for verifying ownership of contact information.
+  phoneVerified Boolean @default(false)
+  emailVerified Boolean @default(false)
+
+  // Tracks the last successful authentication.
+  lastLoginAt DateTime?
+
+  // System-level permission.
+  // This is not the employee job role.
+  // Employee roles are handled separately using BusinessRole.
+  isAdmin Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // A person can have both profiles.
+  // Example:
+  // A cashier can leave employment but still use the customer app.
+  employee Employee?
+  customer Customer?
+}
+
+model Employee {
+  // Shared primary key with User.
+  // An employee is always connected to a user account.
+  id String @id
+
+  user User @relation(fields: [id], references: [id])
+
+  // Ethiopian naming structure.
+  givenName       String
+  fatherName      String
+  grandFatherName String
+
+  profilePicUrl String
+  dateOfBirth   DateTime
+  gender        Gender
+
+  // The person's position inside the café.
+  // Example: CASHIER, MANAGER, KITCHEN.
+  // This is different from system permissions.
+  role BusinessRole
+
+  // Employees should not be deleted.
+  // Their past work, salary, and transaction history must remain.
+  // Instead, their employment status changes.
+  employmentStatus EmploymentStatus @default(ACTIVE)
+
+  // Business date: when they started working.
+  hiredAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // An employee can have multiple emergency contacts.
+  emergencyContacts EmergencyContact[]
+
+  // Current salary configuration.
+  // This stores what they should currently earn.
+  // It does not store payment history.
+  salary EmployeeSalary?
+
+  // Historical salary transactions.
+  // Each payment gets its own record.
+  // Never overwrite old salary payments.
+  salaryPayments SalaryPayment[]
+}
+
+model EmergencyContact {
+  // Separate entity because one employee can have many contacts.
+  id String @id @default(uuid())
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  fullName     String
+  relationship String
+  phoneNumber  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmployeeSalary {
+  // Shared primary key with Employee.
+  // One employee has one current salary configuration.
+  id       String   @id
+  employee Employee @relation(fields: [id], references: [id])
+
+  // Current salary details.
+  // This value can change over time.
+  // Old payments keep their own amount snapshot.
+  amount      Decimal
+  currency    String      @default("ETB")
+  payInterval PayInterval
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SalaryPayment {
+  // Every salary payment is a separate financial record.
+  // Used for salary history and accounting.
+  id String @id @default(uuid())
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  // The actual amount paid at that time.
+  // Do not calculate this from EmployeeSalary because salaries change.
+  amount Decimal
+
+  paymentMethod PaymentMethod
+  status        PaymentStatus @default(COMPLETED)
+
+  // The date the employee received the money.
+  paidAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  note String?
+}
+
+model Customer {
+  // Shared primary key with User.
+  // Customers are platform users, not every anonymous buyer.
+  // Walk-in café buyers do not need customer accounts.
+  id String @id
+
+  user User @relation(fields: [id], references: [id])
+
+  // Customer profile information.
+  fullName      String
+  profilePicUrl String?
+  gender        Gender?
+
+  // Business date: when they became a customer.
+  joinedAt DateTime @default(now())
+
+  // Allows disabling the customer profile without deleting history.
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
