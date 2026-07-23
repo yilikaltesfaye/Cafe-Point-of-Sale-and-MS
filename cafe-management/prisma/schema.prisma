@@ -59,13 +59,21 @@ model User {
   id String @id @default(uuid())
 
   // Authentication identifiers.
-  // Phone is the primary login method for the Ethiopian market.
-  phoneNumber String  @unique
+  // Phone is the primary login method for customers and account recovery.
+  phoneNumber String? @unique
   email       String? @unique
 
-  // Nullable because customers may use other authentication methods later
-  // such as OTP without a password.
+  // Used for customer authentication or future web/mobile access.
+  // Employees mainly authenticate using PIN inside the café.
   passwordHash String?
+
+  // Used by employees for fast POS login.
+  // The PIN is stored as an Argon2 hash, never as plain text.
+  pinHash String?
+
+  // Protects PIN authentication from brute-force attempts.
+  failedPinAttempts Int       @default(0)
+  pinLockedUntil    DateTime?
 
   // Used for verifying ownership of contact information.
   phoneVerified Boolean @default(false)
@@ -87,6 +95,35 @@ model User {
   // A cashier can leave employment but still use the customer app.
   employee Employee?
   customer Customer?
+
+  // Active and historical login sessions.
+  sessions Session[]
+}
+
+model Session {
+  // Represents a login instance.
+  // A user can have multiple sessions from different devices.
+  // Sessions can be revoked without waiting for JWT expiration.
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Stores the hashed refresh token.
+  // The raw token is never saved.
+  refreshTokenHash String @unique
+
+  // Allows tracking where the login happened.
+  deviceInfo String?
+  ipAddress  String?
+
+  expiresAt DateTime
+
+  // When this is set, the session becomes invalid.
+  revokedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Employee {
@@ -192,15 +229,19 @@ model SalaryPayment {
 }
 
 model Customer {
-  // Shared primary key with User.
-  // Customers are platform users, not every anonymous buyer.
-  // Walk-in café buyers do not need customer accounts.
-  id String @id
+  // Customer profiles represent business customers.
+  // They do not require platform accounts.
+  // Walk-in, dine-in, takeaway, and debt customers exist here.
+  id String @id @default(uuid())
 
-  user User @relation(fields: [id], references: [id])
+  // Optional connection to a User account.
+  // Only customers using the future customer app need this.
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
 
   // Customer profile information.
   fullName      String
+  phoneNumber   String?
   profilePicUrl String?
   gender        Gender?
 
