@@ -13,6 +13,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(phoneNumber: string, pin: string) {
-    return null;
+    return this.authService.validateEmployee(phoneNumber, pin);
   }
 }
