@@ -111,12 +111,13 @@ model Session {
 
   // Stores the hashed refresh token.
   // The raw token is never saved.
-  refreshTokenHash String @unique
+  refreshTokenHash String
 
   // Allows tracking where the login happened.
   deviceInfo String?
   ipAddress  String?
 
+  // When the refresh token naturally expires.
   expiresAt DateTime
 
   // When this is set, the session becomes invalid.
@@ -124,6 +125,9 @@ model Session {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Employee {
