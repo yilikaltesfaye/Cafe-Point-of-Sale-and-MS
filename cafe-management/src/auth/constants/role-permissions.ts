@@ -2,10 +2,7 @@ import { BusinessRole } from 'generated/prisma/enums';
 
 import { Permission } from '../enums/permission.enum';
 
-/*
- * Defines what each business role
- * can do inside the system.
- */
+// Defines what each business role can do inside the system.
 export const ROLE_PERMISSIONS = {
   [BusinessRole.OWNER]: [
     Permission.CREATE_ORDER,

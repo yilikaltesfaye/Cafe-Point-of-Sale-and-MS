@@ -71,9 +71,7 @@ export class EmployeeService {
       employee: user.employee,
     };
   }
-  /*
-   * Updates employee information.
-   */
+  // Updates employee information.
   async updateEmployee(id: string, dto: UpdateEmployeeDto) {
     return this.prisma.employee.update({
       where: {
@@ -82,19 +80,13 @@ export class EmployeeService {
 
       data: {
         ...dto,
-
-        /*
-         * Convert date string
-         * before saving.
-         */
+        // Convert date string before saving.
         dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
       },
     });
   }
 
-  /*
-   * Terminates employee without deleting history.
-   */
+  // Terminates employee without deleting history.
   async terminateEmployee(id: string) {
     return this.prisma.employee.update({
       where: {
@@ -102,10 +94,7 @@ export class EmployeeService {
       },
 
       data: {
-        /*
-         * Employee records stay
-         * for transaction history.
-         */
+        //  Employee records stay for transaction history.
         employmentStatus: EmploymentStatus.TERMINATED,
       },
     });

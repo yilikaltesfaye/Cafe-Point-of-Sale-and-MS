@@ -14,9 +14,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     super();
   }
 
-  /*
-   * Allows public routes to skip JWT validation.
-   */
+  // Allows public routes to skip JWT validation.
   canActivate(context: any) {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),

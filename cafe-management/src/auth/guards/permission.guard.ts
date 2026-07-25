@@ -13,23 +13,15 @@ import { ROLE_PERMISSIONS } from '../constants/role-permissions';
 export class PermissionGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
-  /*
-   * Checks if the user's business role
-   * contains the required permissions.
-   */
+  // Checks if the user's business role contains the required permissions.
   canActivate(context: ExecutionContext): boolean {
-    /*
-     * Read required permissions
-     * from @Permissions().
-     */
+    //   Read required permissions from @Permissions().
     const requiredPermissions = this.reflector.getAllAndOverride<Permission[]>(
       PERMISSIONS_KEY,
       [context.getHandler(), context.getClass()],
     );
 
-    /*
-     * Route has no permission requirement.
-     */
+    //   Route has no permission requirement.
     if (!requiredPermissions) {
       return true;
     }
@@ -38,32 +30,22 @@ export class PermissionGuard implements CanActivate {
 
     const user = request.user;
 
-    /*
-     * Admin bypass.
-     */
+    //   Admin bypass.
     if (user?.isAdmin) {
       return true;
     }
 
-    /*
-     * Only employees have
-     * business permissions.
-     */
+    //   Only employees have business permissions.
     if (!user?.employee) {
       throw new ForbiddenException('Employee access required.');
     }
 
     const role = user.employee.role;
 
-    /*
-     * Get permissions assigned
-     * to the employee role.
-     */
+    //   Get permissions assigned to the employee role.
     const permissions = ROLE_PERMISSIONS[role];
 
-    /*
-     * Verify every required permission.
-     */
+    //   Verify every required permission.
     const hasPermission = requiredPermissions.every((permission) =>
       permissions.includes(permission),
     );

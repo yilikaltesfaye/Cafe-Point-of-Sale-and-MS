@@ -4,34 +4,23 @@ import {
   Injectable,
   ForbiddenException,
 } from '@nestjs/common';
-
 import { Reflector } from '@nestjs/core';
-
 import { ROLES_KEY } from '../decorators/roles.decorator';
-
 import { BusinessRole } from 'generated/prisma/enums';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
-  /*
-   * Checks whether the authenticated
-   * employee has permission by role.
-   */
+  // Checks whether the authenticated employee has permission by role.
   canActivate(context: ExecutionContext): boolean {
-    /*
-     * Read roles defined by @Roles().
-     */
+    // Read roles defined by @Roles().
     const requiredRoles = this.reflector.getAllAndOverride<BusinessRole[]>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
 
-    /*
-     * No role requirement.
-     * Authentication is enough.
-     */
+    // No role requirement. Authentication is enough.
     if (!requiredRoles) {
       return true;
     }
@@ -40,25 +29,17 @@ export class RolesGuard implements CanActivate {
 
     const user = request.user;
 
-    /*
-     * System admins bypass
-     * business role restrictions.
-     */
+    // System admins bypass business role restrictions.
+
     if (user?.isAdmin) {
       return true;
     }
-
-    /*
-     * Only employees have
-     * business roles.
-     */
+    // Only employees have business roles.
     if (!user?.employee) {
       throw new ForbiddenException('Employee role required.');
     }
 
-    /*
-     * Check employee role.
-     */
+    // Check employee role.
     const hasRole = requiredRoles.includes(user.employee.role);
 
     if (!hasRole) {

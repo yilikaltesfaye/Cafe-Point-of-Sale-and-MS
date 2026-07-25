@@ -24,10 +24,7 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  /*
-   * Only OWNER and MANAGER
-   * can create employees.
-   */
+  // Only OWNER and MANAGER can create employees.
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(BusinessRole.OWNER, BusinessRole.MANAGER)

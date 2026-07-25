@@ -23,10 +23,7 @@ export class UpdateEmployeeDto {
   @IsEnum(Gender)
   gender?: Gender;
 
-  /*
-   * Allows OWNER/MANAGER
-   * to change employee position.
-   */
+  // Allows OWNER/MANAGER to change employee position.
   @IsOptional()
   @IsEnum(BusinessRole)
   role?: BusinessRole;

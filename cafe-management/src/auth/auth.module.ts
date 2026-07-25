@@ -23,16 +23,16 @@ import { PermissionGuard } from './guards/permission.guard';
 
 @Module({
   imports: [
-    /* Makes PrismaService available inside * AuthService, JwtStrategy, and Guards.*/
+    // Makes PrismaService available inside - AuthService, JwtStrategy, and Guards.
     PrismaModule,
 
-    /* Registers Passport. * JWT is the default authentication strategy. * Sessions are handled manually using Prisma Session. */
+    // Registers Passport. - JWT is the default authentication strategy. - Sessions are handled manually using Prisma Session.
     PassportModule.register({
       defaultStrategy: 'jwt',
       session: false,
     }),
 
-    /* Provides JWT signing and verification. */
+    // Provides JWT signing and verification.
     JwtModule.register({
       secret: process.env.JWT_ACCESS_SECRET!,
       signOptions: {
@@ -44,24 +44,21 @@ import { PermissionGuard } from './guards/permission.guard';
   controllers: [AuthController],
 
   providers: [
-    /* Business authentication logic. */
+    // Business authentication logic.
     AuthService,
 
-    /* Passport strategies. */
+    // Passport strategies.
     LocalStrategy,
     JwtStrategy,
 
-    /* Authentication guards. */
+    // Authentication guards.
     LocalAuthGuard,
     JwtAuthGuard,
 
-    /* Authorization guard. * Checks @Roles() metadata * after authentication succeeds. */
+    // Authorization guard. - Checks @Roles() metadata - after authentication succeeds.
     RolesGuard,
 
-    /*
-     * Protects every route by default.
-     * Routes marked with @Public() bypass JWT.
-     */
+    // Protects every route by default. Routes marked with @Public() bypass JWT.
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
@@ -73,16 +70,16 @@ import { PermissionGuard } from './guards/permission.guard';
   ],
 
   exports: [
-    /* Allows other modules to use Passport. */
+    // Allows other modules to use Passport.
     PassportModule,
 
-    /* Allows other modules to create * and verify JWT tokens. */
+    // Allows other modules to create - and verify JWT tokens.
     JwtModule,
 
-    /* Allows controllers in other modules * to protect routes. */
+    // Allows controllers in other modules - to protect routes.
     JwtAuthGuard,
 
-    /* * Allows other modules to use * role-based authorization. */
+    // Allows other modules to use - role-based authorization.
     RolesGuard,
     AdminGuard,
     EmployeeGuard,
