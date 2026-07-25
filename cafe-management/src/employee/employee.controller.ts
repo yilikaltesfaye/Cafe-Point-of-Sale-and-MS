@@ -11,14 +11,9 @@ import { EmployeeService } from './employee.service';
 
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-
-import { Roles } from 'src/auth/decorators/roles.decorator';
-
 import { BusinessRole } from 'generated/prisma/enums';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
 @Controller('employees')
 export class EmployeeController {
@@ -26,22 +21,19 @@ export class EmployeeController {
 
   // Only OWNER and MANAGER can create employees.
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(BusinessRole.OWNER, BusinessRole.MANAGER)
+  @Auth(BusinessRole.OWNER, BusinessRole.MANAGER)
   createEmployee(@Body() dto: CreateEmployeeDto) {
     return this.employeeService.createEmployee(dto);
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(BusinessRole.OWNER, BusinessRole.MANAGER)
+  @Auth(BusinessRole.OWNER, BusinessRole.MANAGER)
   updateEmployee(@Param('id') id: string, @Body() dto: UpdateEmployeeDto) {
     return this.employeeService.updateEmployee(id, dto);
   }
 
   @Patch(':id/terminate')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(BusinessRole.OWNER)
+  @Auth(BusinessRole.OWNER)
   terminateEmployee(@Param('id') id: string) {
     return this.employeeService.terminateEmployee(id);
   }

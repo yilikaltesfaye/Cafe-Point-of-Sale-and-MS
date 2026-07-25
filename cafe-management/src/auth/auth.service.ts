@@ -380,11 +380,11 @@ export class AuthService {
   // Revokes a single session.
   // The refresh token linked to this session
   // becomes unusable immediately
-  async logout(dto: LogoutDto, userId: string) {
-    const session = await this.prisma.session.findUnique({
+  async logout(sessionId: string, userId: string) {
+    const session = await this.prisma.session.findFirst({
       where: {
-        id: dto.sessionId,
-        userId: userId,
+        id: sessionId,
+        userId,
       },
     });
 
@@ -399,7 +399,7 @@ export class AuthService {
     // - Security events may need investigation.
     await this.prisma.session.update({
       where: {
-        id: dto.sessionId,
+        id: sessionId,
       },
 
       data: {
@@ -408,7 +408,7 @@ export class AuthService {
     });
 
     return {
-      message: 'Session revoked successfully.',
+      message: 'Logged out successfully.',
     };
   }
 

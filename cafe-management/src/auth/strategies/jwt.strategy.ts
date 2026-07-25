@@ -72,6 +72,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     //  Returned object becomes: request.user
-    return user;
+    /*
+     * Attach session information
+     * to every authenticated request.
+     */
+    return {
+      ...user,
+      sessionId: session.id,
+    };
   }
 }
