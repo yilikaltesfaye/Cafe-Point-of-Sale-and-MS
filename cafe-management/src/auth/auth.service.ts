@@ -455,10 +455,11 @@ export class AuthService {
    * The refresh token linked to this session
    * becomes unusable immediately.
    */
-  async logout(dto: LogoutDto) {
+  async logout(dto: LogoutDto, userId: string) {
     const session = await this.prisma.session.findUnique({
       where: {
         id: dto.sessionId,
+        userId: userId,
       },
     });
 
@@ -512,68 +513,6 @@ export class AuthService {
 
     return {
       message: 'All sessions revoked.',
-    };
-  }
-  async createEmployee(dto: CreateEmployeeDto) {
-    /*
-     * Prevent duplicate phone accounts.
-     */
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        phoneNumber: dto.phoneNumber,
-      },
-    });
-
-    if (existingUser) {
-      throw new BadRequestException('Phone number already exists.');
-    }
-
-    /*
-     * Hash PIN before storage.
-     */
-    const pinHash = await argon2.hash(dto.pin);
-
-    /*
-     * Create account and employee
-     * profile together.
-     */
-    const user = await this.prisma.user.create({
-      data: {
-        phoneNumber: dto.phoneNumber,
-
-        pinHash,
-
-        employee: {
-          create: {
-            givenName: dto.givenName,
-
-            fatherName: dto.fatherName,
-
-            grandFatherName: dto.grandFatherName,
-
-            profilePicUrl: '',
-
-            dateOfBirth: new Date(dto.dateOfBirth),
-
-            gender: dto.gender,
-
-            role: dto.role,
-          },
-        },
-      },
-
-      include: {
-        employee: true,
-      },
-    });
-
-    /*
-     * Do not return authentication hashes.
-     */
-    return {
-      message: 'Employee created successfully.',
-
-      employee: user.employee,
     };
   }
 }

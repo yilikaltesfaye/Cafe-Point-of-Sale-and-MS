@@ -69,13 +69,17 @@ export class AuthController {
    */
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  logout(@Body() dto: LogoutDto) {
-    return this.authService.logout(dto);
+  logout(@Body() dto: LogoutDto, @Req() req: Request) {
+    return this.authService.logout(dto, (req.user as User).id);
   }
 
-  @Post('employees')
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  createEmployee(@Body() dto: CreateEmployeeDto) {
-    return this.authService.createEmployee(dto);
+  /*
+   * Revokes every active session
+   * for the authenticated user.
+   */
+  @Post('logout-all')
+  @UseGuards(JwtAuthGuard)
+  logoutAll(@Req() req: Request) {
+    return this.authService.logoutAll((req.user as User).id);
   }
 }
