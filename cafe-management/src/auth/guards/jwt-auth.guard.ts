@@ -1,10 +1,32 @@
+// src/auth/guards/jwt-auth.guard.ts
+
 import { Injectable } from '@nestjs/common';
+
 import { AuthGuard } from '@nestjs/passport';
 
-/*
- * Uses the JwtStrategy.
- * Every protected route will pass through this guard.
- * If the access token is valid, Passport attaches the user to req.user.
- */
+import { Reflector } from '@nestjs/core';
+
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {}
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(private readonly reflector: Reflector) {
+    super();
+  }
+
+  /*
+   * Allows public routes to skip JWT validation.
+   */
+  canActivate(context: any) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) {
+      return true;
+    }
+
+    return super.canActivate(context);
+  }
+}
