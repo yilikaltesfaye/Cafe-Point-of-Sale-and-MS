@@ -1,4 +1,4 @@
-import { BusinessRole } from 'generated/prisma/client';
+import { BusinessRole } from 'generated/prisma/enums';
 
 import { Permission } from '../enums/permission.enum';
 

@@ -1,6 +1,6 @@
 import { IsEnum, IsString, IsDateString, MinLength } from 'class-validator';
 
-import { BusinessRole, Gender } from 'generated/prisma/client';
+import { BusinessRole, Gender } from 'generated/prisma/enums';
 
 export class CreateEmployeeDto {
   /*

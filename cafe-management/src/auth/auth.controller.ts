@@ -9,8 +9,6 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterAdminDto } from './dto/register-admin.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { Public } from './decorators/public.decorator';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { AdminGuard } from './guards/admin.guard';
 
 @Controller('auth')
 export class AuthController {

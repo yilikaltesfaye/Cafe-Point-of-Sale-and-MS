@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon2 from 'argon2';
-import { EmploymentStatus, User } from 'generated/prisma/client';
+import { User } from 'generated/prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import ms, { type StringValue } from 'ms';
-import { BusinessRole } from 'generated/prisma/client';
+import { BusinessRole, EmploymentStatus } from 'generated/prisma/enums';
 import { RegisterAdminDto } from './dto/register-admin.dto'; // Used for verifying
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
