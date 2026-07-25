@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  ForbiddenException,
+} from '@nestjs/common';
 
 import { Reflector } from '@nestjs/core';
 
@@ -10,10 +15,13 @@ import { BusinessRole } from 'generated/prisma/client';
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
+  /*
+   * Checks whether the authenticated
+   * employee has permission by role.
+   */
   canActivate(context: ExecutionContext): boolean {
     /*
-     * Read required roles
-     * from the controller metadata.
+     * Read roles defined by @Roles().
      */
     const requiredRoles = this.reflector.getAllAndOverride<BusinessRole[]>(
       ROLES_KEY,
@@ -21,43 +29,42 @@ export class RolesGuard implements CanActivate {
     );
 
     /*
-     * No roles specified.
-     *
-     * Authentication alone is enough.
+     * No role requirement.
+     * Authentication is enough.
      */
     if (!requiredRoles) {
       return true;
     }
 
-    /*
-     * Get authenticated user
-     * from JwtAuthGuard.
-     */
     const request = context.switchToHttp().getRequest();
 
     const user = request.user;
 
     /*
-     * Admin bypass.
-     *
-     * System administrators have
-     * access regardless of employee role.
+     * System admins bypass
+     * business role restrictions.
      */
-    if (user.isAdmin) {
+    if (user?.isAdmin) {
       return true;
     }
 
     /*
-     * User must have an employee profile
-     * to use business roles.
+     * Only employees have
+     * business roles.
      */
-    if (!user.employee) {
-      return false;
+    if (!user?.employee) {
+      throw new ForbiddenException('Employee role required.');
     }
 
     /*
      * Check employee role.
      */
-    return requiredRoles.includes(user.employee.role);
+    const hasRole = requiredRoles.includes(user.employee.role);
+
+    if (!hasRole) {
+      throw new ForbiddenException('Insufficient role permissions.');
+    }
+
+    return true;
   }
 }
