@@ -19,6 +19,7 @@ import { CustomerGuard } from './guards/customer.guard';
 
 import { type StringValue } from 'ms';
 import { APP_GUARD } from '@nestjs/core';
+import { PermissionGuard } from './guards/permission.guard';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { APP_GUARD } from '@nestjs/core';
     AdminGuard,
     EmployeeGuard,
     CustomerGuard,
+    PermissionGuard,
   ],
 
   exports: [
@@ -85,6 +87,7 @@ import { APP_GUARD } from '@nestjs/core';
     AdminGuard,
     EmployeeGuard,
     CustomerGuard,
+    PermissionGuard,
   ],
 })
 export class AuthModule {}
