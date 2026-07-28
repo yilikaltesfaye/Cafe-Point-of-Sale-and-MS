@@ -3,7 +3,6 @@ import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginDto } from './dto/login.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterAdminDto } from './dto/register-admin.dto';
 import { Public } from './decorators/public.decorator';
