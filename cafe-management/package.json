@@ -39,6 +39,7 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.4.5",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "argon2": "^0.45.1",
@@ -100,7 +101,10 @@
   },
   "allowScripts": {
     "argon2@0.45.1": true,
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver@1.12.2": true,
+    "prisma@7.9.1": true,
+    "@prisma/engines@7.9.1": true,
+    "@scarf/scarf@1.4.0": true
   },
   "overrides": {
     "brace-expansion": "^2.0.1"
