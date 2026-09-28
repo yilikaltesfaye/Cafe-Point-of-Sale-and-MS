@@ -15,7 +15,6 @@ The backend provides authentication, session management, authorization, and empl
 - PostgreSQL
 - Argon2
 - `class-validator` and `class-transformer`
-- Jest and Supertest
 - Docker Compose
 
 ### `cafeposMS`
@@ -67,7 +66,6 @@ The frontend currently contains the Vite React entry point and a minimal `App` c
 │   │   ├── auth/
 │   │   ├── employee/
 │   │   └── prisma/
-│   ├── test/
 │   ├── docker-compose.yml
 │   ├── package.json
 │   └── prisma.config.ts
